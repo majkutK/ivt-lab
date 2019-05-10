@@ -82,4 +82,18 @@ public class GT4500Test {
     verify(mockPrimary, times(1)).isEmpty();
     verify(mockSecondary, times(1)).fire(1);
   }
+
+  @Test
+  public void fireTorpedo_Single_PrimaryFired_Failed() {
+    // Arrange
+    when(mockPrimary.isEmpty()).thenReturn(false);
+    when(mockPrimary.fire(1)).thenReturn(false);
+
+    // Act
+    boolean result = ship.fireTorpedo(FiringMode.SINGLE);
+
+    // Assert
+    assertEquals(false, result);
+    verify(mockPrimary, times(1)).fire(1);
+  }
 }
