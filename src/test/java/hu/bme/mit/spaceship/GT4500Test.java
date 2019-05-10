@@ -9,37 +9,77 @@ import static org.mockito.Mockito.*;
 public class GT4500Test {
 
   private GT4500 ship;
+  private TorpedoStore mockPrimary;
+  private TorpedoStore mockSecondary;
 
   @BeforeEach
   public void init(){
-    /*
-    TorpedoStore mockPrimary = mock(TorpedoStore.class);
-    TorpedoStore mockSecondary = mock(TorpedoStore.class);
+    mockPrimary = mock(TorpedoStore.class);
+    mockSecondary = mock(TorpedoStore.class);
     this.ship = new GT4500(mockPrimary, mockSecondary);
-    */
-    this.ship = new GT4500();
   }
 
   @Test
   public void fireTorpedo_Single_Success(){
     // Arrange
+    when(mockPrimary.isEmpty()).thenReturn(false);
+    when(mockPrimary.fire(1)).thenReturn(true);
 
     // Act
     boolean result = ship.fireTorpedo(FiringMode.SINGLE);
 
     // Assert
-    assertEquals(true, result);
+    //assertEquals(true, result);
+    verify(mockPrimary, times(1)).fire(1);
   }
 
   @Test
   public void fireTorpedo_All_Success(){
     // Arrange
+    when(mockPrimary.isEmpty()).thenReturn(false);
+    when(mockPrimary.fire(1)).thenReturn(true);
+
+    when(mockSecondary.isEmpty()).thenReturn(false);
+    when(mockSecondary.fire(1)).thenReturn(true);
 
     // Act
     boolean result = ship.fireTorpedo(FiringMode.ALL);
 
     // Assert
     assertEquals(true, result);
+    verify(mockPrimary, times(1)).fire(1);
+    verify(mockSecondary, times(1)).fire(1);
   }
 
+  @Test
+  public void fireTorpedo_All_PrimaryFails_Success() {
+    // Arrange
+    when(mockPrimary.isEmpty()).thenReturn(true);
+    when(mockSecondary.isEmpty()).thenReturn(false);
+    when(mockSecondary.fire(1)).thenReturn(true);
+
+    // Act
+    boolean result = ship.fireTorpedo(FiringMode.ALL);
+
+    // Assert
+    assertEquals(true, result);
+    verify(mockPrimary, times(1)).isEmpty();
+    verify(mockSecondary, times(1)).fire(1);
+  }
+
+  @Test
+  public void fireTorpedo_Single_PrimaryEmpty_Secondaryfire_Success() {
+    // Arrange
+    when(mockPrimary.isEmpty()).thenReturn(true);
+    when(mockSecondary.isEmpty()).thenReturn(false);
+    when(mockSecondary.fire(1)).thenReturn(true);
+
+    // Act
+    boolean result = ship.fireTorpedo(FiringMode.SINGLE);
+
+    // Assert
+    assertEquals(true, result);
+    verify(mockPrimary, times(1)).isEmpty();
+    verify(mockSecondary, times(1)).fire(1);
+  }
 }
